@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block title %} | User Dashboard {% endblock %}
+{% block content %}
+<section id="showcase-inner" class="py-5 text-white">
+    <div class="container"> 
+      <div class="row text-center">
+        <div class="col-md-12">
+          <h1 class="display-4">User Dashboard</h1>
+          <p class="lead">Manage your Users </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Breadcrumb -->
+  <section id="bc" class="mt-3">
+    <div class="container">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="{% url 'login' %}">
+              <i class="fas fa-home"></i> Home</a>
+          </li>
+          <li class="breadcrumb-item active"> Dashboard</li>
+        </ol>
+      </nav>
+    </div>
+  </section>
+
+  <section id="dashboard" class="py-4">    
+    <div class="container">
+      <h2>Welcome {{ user.username }} </h2>
+      <div class="row">
+        <div class="col-lg-6 col-md-12 col-sm-12">
+          <div class="card">
+            <div class="card-header bg-primary text-white">
+              <h4><i class="fas fa-user-plus"></i> View User</h4>
+            </div>
+            <div class="card-body">
+            <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              
+              {% if users %}
+                {% for user in users %}
+                  <tr data-id="{{user.id}}">
+                    <td>{{ user.username }}</td>
+                    <td><a class="btn btn-primary" style="background-color: #30caa0; border-color: #30caa0;" href="{% url 'viewuser' user.id %}">View</a></td>
+                    <td><a class="btn btn-primary" style="background-color: #30caa0; border-color: #30caa0;" href="{% url 'edituser' user.id %}">Edit</a></td>
+                    <td><button class="btn btn-danger deletebutton" data-id="{{user.id}}" data-url="{% url 'deleteuser' user.id %}">Delete</button></td>
+                  </tr>
+                {% endfor %}
+              {% endif %}
+              
+            </tbody>
+          </table>
+            </div>
+          </div>
+        </div>
+      
+
+        <div class="col-lg-6 col-md-12 col-sm-12">
+          <div class="card">
+            <div class="card-header bg-primary text-white">
+              <h4><i class="fas fa-user-plus"></i> Add User</h4>
+            </div>
+            <div class="card-body">                
+                  <div class="form-group">
+                  <label for="first_name">First Name:</label>
+                  <input type="text" id="first_name" name="first_name" class="form-control">
+                </div>
+                <div class="form-group">
+                  <label for="last_name">Last Name:</label>
+                  <input type="text" id="last_name" name="last_name" class="form-control">
+                </div>
+                <div class="form-group">
+                  <label for="username">Username:</label>
+                  <input type="text" id="username" name="username" class="form-control">
+                </div>
+                <div class="form-group">
+                  <label for="email">Email:</label>
+                  <input type="email" id="email" name="email" class="form-control">
+                </div>
+                <div class="form-group">
+                  <label for="password2">Password:</label>
+                  <input type="password" placeholder="Must contain 6 characters" id="password" name="password" class="form-control">
+                </div>  
+                <div class="form-group">
+                  <label for="is_superuser">Is a superuser? :</label>
+                  <input type="checkbox" id="is_superuser" >  
+                </div>
+                <div class="form-group">
+                  <label for="is_staff">Is a staff? :</label>
+                  <input type="checkbox" id="is_staff">
+                </div>
+               
+                <button id="save-button" class="btn btn-secondary btn-block">
+                  Save
+                </button>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+{% endblock %}
+
+{% block script %}
+<script>
+
+$(document).ready(function(){
+
+
+  $("#username, #email").keyup(function(){
+    $(this).val($.trim($(this).val()).toLowerCase());
+    
+  });
+
+  $("#save-button").click(function(){
+    var first_name = $("#first_name").val();
+    var last_name = $("#last_name").val();
+    var username = $.trim($("#username").val());
+    var password = $("#password").val();
+    var email = $.trim($("#email").val());
+    var is_superuser = $("#is_superuser").is(":checked") ? 1:0;
+    var is_staff = $("#is_staff").is(":checked") ? 1:0;
+    //console.log(email)
+    //console.log(is_staff)
+
+      if(username.length == 0){
+        //alert("username is required");
+        $.alert({
+          title: 'Alert!',
+          content: 'Username is required!',
+      });
+        //$('#username').focus();
+        return;
+      }
+
+      if(email.length == 0){
+        //alert("email is required");
+        //$('#email').focus();
+        $.alert({
+          title: 'Alert!',
+          content: 'Email is required!',
+      });
+        return;
+      }
+
+      if(password.length == 0){
+        //alert("password is required");
+        //$('#pasword').focus();
+        $.alert({
+          title: 'Alert!',
+          content: 'Password is required!',
+      });
+        return;
+      }
+
+      if(password.length < 6){
+        //alert("password must be at least 6 characters");
+        //$('#password').focus();
+        $.alert({
+          title: 'Alert!',
+          content: 'password must be at least 6 characters!',
+      });
+        return;
+      }
+      
+      if(/^[A-Za-z0-9_]+$/.test(username) == false){
+        //alert("Username only contains characters, numbers and underscores")
+        //$('#username').focus();
+        $.alert({
+          title: 'Alert!',
+          content: 'Username only contains characters, numbers and underscores!',
+      });
+        return;
+      }
+
+      if(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email) == false){
+        //alert("Invalid email");
+        //$('#email').focus();
+        $.alert({
+          title: 'Alert!',
+          content: 'Invalid email!',
+      });
+        return;
+      }
+      
+      
+      $.ajax({
+        url:"{% url 'register' %}",
+        method:"POST",
+        data:{username:username, password:password, email:email, first_name:first_name, last_name:last_name, is_superuser:is_superuser, is_staff:is_staff, csrfmiddlewaretoken:"{{csrf_token}}"},
+        success:function(response){
+            if(response.status == 1){
+              //console.log("ok");
+              //alert("");
+              $.alert({
+                title: 'Alert!',
+                content: 'This user exists!',
+            });
+              //window.location.href = location.href;
+              //$("#username").focus();
+            }else if(response.status == 2){
+              //alert("");
+              $.alert({
+                title: 'Alert!',
+                content: 'email already exists!',
+            });
+              //window.location.href = location.href;
+              //$("#email").focus();
+            }else if(response.status == 3){
+              //alert("User is saved successfully");
+              $.alert({
+                title: 'Alert!',
+                content: 'User is saved successfully!',
+              });
+              setTimeout(function(){
+                window.location.href = "{% url 'dashboard' %}"
+              },1000);
+            }else{
+              $.alert({
+                  title: 'Alert!',
+                  content: 'Sorry, an error occured',
+              });
+            }
+        },
+        error:function(err, ajaxOptions, thrownError){
+          alert('Save failed - please try again');
+        }
+    });
+  });
+
+  $(".deletebutton").click(function(e){
+    //e.preventDefault();
+    var user_url = $.trim($(this).data("url"));
+    //var user_delete = $(this).closest( 'tr');
+    var user_id = $.trim($(this).data("id"));
+
+    $.confirm({
+      icon: 'fa fa-question',
+      title: 'Hello!',
+      content: 'Are you sure to continue?',
+      type: 'red',
+      typeAnimated: true,
+      closeIcon: true,
+      closeIconClass: 'fa fa-close',
+      escapeKey: true,
+      backgroundDismiss: true,
+      buttons: {
+          tryAgain: {
+              text: 'Confirm',
+              btnClass: 'btn-red',
+              action: function(){
+                $.ajax({
+                  
+                  url: user_url,
+                  method:"POST",
+                  data: {csrfmiddlewaretoken:"{{csrf_token}}"},
+                  success: function(response){
+                    if(response.status == 1){
+                      //user_delete.remove();
+                      $('tr[data-id="'+user_id+'"]').remove();
+                      $.alert({
+                        title: 'Congratulations!',
+                        content: 'User is deleted successfully!',  
+                    });
+                    }
+                  },
+                  error: function(err, ajaxOptions, thrownError){
+                    alert('Delete failed - please try again');
+                  },
+                    });
+              }
+          },
+          close: {
+            text: 'Cancel',
+            action: function () {
+ 
+          },
+        }
+      },
+
+
+    });
+
+  });
+});
+
+
+</script>
+{% endblock %}

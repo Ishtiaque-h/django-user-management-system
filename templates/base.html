@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{% static 'css/all.css' %}">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- Jquery alerts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+
+    <title> Practice Project {% block title %}{% endblock %}</title>
+</head>
+<body>
+
+ 
+ <!-- Nav Bar -->
+ {% include 'partials/_navbar.html' %}
+
+  <!-- Main Content -->
+
+    {% block content %} {% endblock %}
+    
+<!-- Footer -->
+{% include 'partials/_footer.html' %}
+    
+    <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+    {% block script %} {% endblock %}
+</body>
+</html>

@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %} | Login {% endblock %}
+{% block content %}
+<section id="login" class="bg-light py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 mx-auto">
+          <div class="card">
+            <div class="card-header bg-primary text-white">
+              <h4>
+                <i class="fas fa-sign-in-alt"></i> Login</h4>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                  <label for="username">Username</label>
+                  <input type="text" id="username" class="form-control">
+                </div>
+
+                <div class="form-group">
+                  <label for="password">Password</label>
+                  <input type="password" id="password" class="form-control">
+                </div>
+
+                <button class="btn btn-secondary btn-block" id="login-button">
+                    Login
+                </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+{% endblock %}
+
+{%block script%}
+
+  <script>
+
+    /*window.onload = function(){
+
+
+    }*/
+
+    $(document).ready(function(){
+
+      $("#username").keyup(function(){
+        $(this).val($.trim($(this).val()).toLowerCase());      
+      });
+
+      $("#login-button").click(function(){
+        var username = $.trim($("#username").val());
+        var password = $("#password").val();
+        
+        if(username.length==0){
+          //alert("");
+          $.alert({
+            title: 'Alert!',
+            content: 'Username is required',
+          });
+          return;
+        }
+
+        if(password.length==0){
+          //alert("");
+          $.alert({
+            title: 'Alert!',
+            content: 'Password is required!!',
+          }); 
+          return;
+        }
+
+        $.ajax({
+            url:"{% url 'login' %}",
+            method:"POST",
+            data:{username:username, password:password, csrfmiddlewaretoken:"{{csrf_token}}"},
+            success:function(response){
+                if(response.status == 1){
+                  //alert("");
+                  $.alert({
+                    title: 'Congratulations!',
+                    content: 'You are successfully logged in!',
+                  });
+                  setTimeout(function(){
+                    window.location.href = "{% url 'dashboard' %}"
+                  },1000);
+                }
+                else{
+                  //alert("");
+                  $.alert({
+                    title: 'Alert!',
+                    content: 'Invalid username and password combination!',
+                  });
+                  $("#password").val("");
+                }
+            },
+            error:function(err, ajaxOptions, thrownError){
+              //alert('');
+              $.alert({
+                title: 'Alert!',
+                content: 'login failed - please try again!',
+              });
+            }
+        });
+
+      });
+
+    });
+
+  </script>
+
+{% endblock %}

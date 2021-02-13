@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %} | {{ user_details.username}}{% endblock %}
+
+{% block content %}
+
+<section id="showcase-inner" class="py-5 text-white">
+    <div class="container">
+      <div class="row text-center">
+        <div class="col-md-12">
+          <h1 class="display-4">{{user_details.username}}</h1>
+          <p class="lead">
+            <i class="fas fa-map-marker"></i> {{user_details.email}}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Breadcrumb -->
+  <section id="bc" class="mt-3">
+    <div class="container">
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+          </li>
+          <li class="breadcrumb-item active">{{user_details.username}}</li>
+        </ol>
+      </nav>
+    </div>
+  </section>
+
+  <section id="dashboard" class="py-4">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">id</th>
+                <th scope="col">Name</th>
+                <th scope="col">Username</th>
+                <th scope="col">Email</th>
+                <th scope="col">Is a superuser?</th>
+                <th scope="col">Is a staff?</th>
+              </tr>
+            </thead>
+            <tbody>
+            
+            {% if user_details %}
+                
+                    <tr>
+                    <td> {{user_details.id}} </td>
+                    <td> {{user_details.first_name }} {{user_details.last_name}} </td>
+                    <td> {{user_details.username}} </td>
+                    <td> {{user_details.email}} </td>
+                    <td>{{user_details.is_superuser}}</td>
+                    <td>{{user_details.is_staff}}</td>
+                    </tr>
+                
+            {% endif %}
+                
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+{% endblock %}

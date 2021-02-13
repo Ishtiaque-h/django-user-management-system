@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %} | {{ user_details.username}}{% endblock %}
+
+{% block content %}
+
+<section id="showcase-inner" class="py-5 text-white">
+    <div class="container">
+      <div class="row text-center">
+        <div class="col-md-12">
+          <h1 class="display-4">{{user_details.username}}</h1>
+          <p class="lead">
+            <i class="fas fa-map-marker"></i> {{user_details.email}}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Breadcrumb -->
+  <section id="bc" class="mt-3">
+    <div class="container">
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+          </li>
+          <li class="breadcrumb-item active">{{user_details.username}}</li>
+        </ol>
+      </nav>
+    </div>
+  </section>
+
+  <section id="edituser" class="py-4">    
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+              <div class="card-header bg-primary text-white">
+                <h4><i class="fas fa-user-plus"></i> Edit User</h4>
+              </div>
+              <div class="card-body">                
+                    <div class="form-group">
+                    <label for="first_name">First Name:</label>
+                    <input type="text" id="first_name" name="first_name" class="form-control" value="{{user_details.first_name}}" >
+                  </div>
+                  <div class="form-group">
+                    <label for="last_name">Last Name:</label>
+                    <input type="text" id="last_name" name="last_name" class="form-control" value="{{user_details.last_name}}">
+                  </div>
+                  <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" class="form-control" value="{{user_details.username}}">
+                  </div>
+                  <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" class="form-control"  value="{{user_details.email}}">
+                  </div>
+                  <div class="form-group">
+                    <label for="password2">Password:</label>
+                    <input type="password" placeholder="Must contain 6 characters" id="password" name="password" class="form-control">
+                  </div>  
+                  <div class="form-group">
+                    <label for="is_superuser">Is a superuser? :</label>
+                    <input type="checkbox" id="is_superuser" {% if user_details.is_superuser %}checked{% endif %} >  
+                  </div>
+                  <div class="form-group">
+                    <label for="is_staff">Is a staff? :</label>
+                    <input type="checkbox" id="is_staff" {% if user_details.is_staff %}checked{% endif %}>
+                  </div>
+                 
+                  <button id="update-button" class="btn btn-secondary btn-block">
+                    Update
+                  </button>
+                
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </section>
+    
+{% endblock %}
+
+
+{% block script %}
+<script>
+
+$(document).ready(function(){
+
+
+  $("#username, #email").keyup(function(){
+    $(this).val($.trim($(this).val()).toLowerCase());
+    
+  });
+
+  $("#update-button").click(function(){
+    var first_name = $("#first_name").val();
+    var last_name = $("#last_name").val();
+    var username = $.trim($("#username").val());
+    var password = $("#password").val();
+    var email = $.trim($("#email").val());
+    var is_superuser = $("#is_superuser").is(":checked") ? 1:0;
+    var is_staff = $("#is_staff").is(":checked") ? 1:0;
+    //console.log(email)
+    //console.log(is_staff)
+
+      if(username.length == 0){
+        //alert("");
+        $.alert({
+          title: 'Alert!',
+          content: 'Username is required!',
+      });
+        return;
+      }
+
+      if(password.length != 0 && password.length < 6){
+        //alert("");
+        $.alert({
+          title: 'Alert!',
+          content: 'Password must be at least 6 characters!',
+      });
+        return;
+      }
+
+      if(email.length == 0){
+        //alert("");
+        $.alert({
+          title: 'Alert!',
+          content: 'Email is required!',
+      });
+        return;
+      }
+      
+      if(/^[A-Za-z0-9_]+$/.test(username) == false){
+        //alert("")
+        $.alert({
+          title: 'Alert!',
+          content: 'Username only contains characters, numbers and underscores!',
+      });
+        return;
+      }
+
+      if(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email) == false){
+        //alert("");
+        $.alert({
+          title: 'Alert!',
+          content: 'Invalid email!',
+      });
+        return;
+      }
+      
+      
+      $.ajax({
+        url:"{% url 'updateuser' user_details.id %}",
+        method:"POST",
+        data:{username:username, password:password, email:email, first_name:first_name, last_name:last_name, is_superuser:is_superuser, is_staff:is_staff, csrfmiddlewaretoken:"{{csrf_token}}"},
+        success:function(response){
+            if(response.status == 1){
+              //alert("");
+              //$("#username").val("");
+              $.alert({
+                title: 'Alert!',
+                content: 'This user exists!',
+            });
+            }
+            else if(response.status == 2){
+              //alert("");
+              //$("#email").val("");
+              $.alert({
+                title: 'Alert!',
+                content: 'This user exists!',
+            });
+            }
+            else{
+              //alert("");
+              $.alert({
+                title: 'Alert!',
+                content: 'User is updated successfully!',
+            });
+            setTimeout(function(){
+              window.location.href = "{% url 'viewuser' user_details.id %}"},
+              1000);
+            }
+        },
+        error:function(err, ajaxOptions, thrownError){
+          alert('Update failed - please try again');
+        }
+    });
+  });
+
+});
+
+
+</script>
+
+{% endblock %}
