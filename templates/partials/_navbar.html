@@ -8,7 +8,7 @@
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         
         <ul class="navbar-nav ml-auto">
-          {% if user.is_authenticated %}
+          {% if user.is_authenticated and 'login' in request.path %}
           <li
             {% if 'dashboard' or 'viewuser' or 'edituser' in request.path  %}
             class="nav-item active mr-3"
